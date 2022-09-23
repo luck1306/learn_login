@@ -1,6 +1,7 @@
 package com.example.learn_login.controller;
 
 import com.example.learn_login.dto.RequestForSignUp;
+import com.example.learn_login.dto.TokenDto;
 import com.example.learn_login.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,5 +22,10 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public void signUp(@RequestBody RequestForSignUp request){
         authService.signUp(request);
+    }
+
+    @PostMapping("/sign-in")
+    public TokenDto singIn(@RequestBody RequestForSignUp request) {
+        return authService.signIn(request);
     }
 }

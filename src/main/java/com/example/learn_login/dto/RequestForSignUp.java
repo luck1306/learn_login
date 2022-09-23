@@ -1,5 +1,6 @@
 package com.example.learn_login.dto;
 
+import com.example.learn_login.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,4 +15,11 @@ public class RequestForSignUp {
 
     @NotEmpty
     private String password;
+
+    public User toUser() {
+        return User.builder()
+                .accountId(this.accountId)
+                .password(this.password)
+                .build();
+    }
 }
