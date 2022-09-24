@@ -31,7 +31,7 @@ public class AuthService {
     }
 
     public TokenDto signIn(RequestForSignUp request) {
-        UsernamePasswordAuthenticationToken authenticationToken = jwtProvider.generateAuthentication(request.toUser());
+        UsernamePasswordAuthenticationToken authenticationToken = request.toAuthenticationToken();
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
