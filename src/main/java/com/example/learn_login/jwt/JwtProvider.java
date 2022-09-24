@@ -24,17 +24,17 @@ import java.util.stream.Collectors;
 public class JwtProvider {
 
     @Value("${jwt.secret}")
-    private final String key;
+    private String key;
 
     @Value("${jwt.expired.access}")
-    private final Long accessExp;
+    private Long accessExp;
 
     @Value("${jwt.expired.refresh}")
-    private final Long refreshExp;
+    private Long refreshExp;
 
     private final RefreshRepo refreshRepo;
 
-    public Authentication generateAuthentication(User user) {
+    public UsernamePasswordAuthenticationToken generateAuthentication(User user) {
 
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(user.getRole().toString().split(","))
@@ -64,7 +64,7 @@ public class JwtProvider {
         return refreshRepo.save(RefreshToken.builder()
                 .key(authentication.getName())
                 .value(generateToken(authentication.getName(), "refresh_token", refreshExp))
-                .build()).getValue();
+                .build()).getValueA();
     }
 
 }

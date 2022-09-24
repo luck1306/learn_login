@@ -6,6 +6,7 @@ import com.example.learn_login.entity.User;
 import com.example.learn_login.entity.UserRepository;
 import com.example.learn_login.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +31,7 @@ public class AuthService {
     }
 
     public TokenDto signIn(RequestForSignUp request) {
-        Authentication authenticationToken = jwtProvider.generateAuthentication(request.toUser());
+        UsernamePasswordAuthenticationToken authenticationToken = jwtProvider.generateAuthentication(request.toUser());
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 

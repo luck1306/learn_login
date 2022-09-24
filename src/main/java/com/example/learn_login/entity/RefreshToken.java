@@ -20,14 +20,14 @@ public class RefreshToken {
     private Long id;
 
     @Column(nullable = false)
-    private String key;
+    private String keyA;
 
     @Column(nullable = false)
-    private String value;
+    private String valueA;
 
     @Builder
     public RefreshToken(String key, String value) {
-        this.key = key;
-        this.value = value;
+        this.keyA = key;
+        this.valueA = value;
     }
 }
