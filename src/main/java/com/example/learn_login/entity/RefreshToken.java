@@ -30,4 +30,8 @@ public class RefreshToken {
         this.keyA = key;
         this.valueA = value;
     }
+
+    public void updateValue(String value) {
+        this.valueA = value;
+    }
 }

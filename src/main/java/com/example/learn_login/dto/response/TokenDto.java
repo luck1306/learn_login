@@ -1,4 +1,4 @@
-package com.example.learn_login.dto;
+package com.example.learn_login.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

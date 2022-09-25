@@ -1,4 +1,4 @@
-package com.example.learn_login.dto;
+package com.example.learn_login.dto.request;
 
 import com.example.learn_login.entity.User;
 import javax.validation.constraints.NotNull;

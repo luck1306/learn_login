@@ -3,6 +3,7 @@ package com.example.learn_login.jwt;
 import com.example.learn_login.entity.RefreshRepo;
 import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -65,6 +67,14 @@ public class JwtProvider {
                 .key(authentication.getName())
                 .value(generateToken(authentication.getName(), "refresh_token", refreshExp))
                 .build()).getValueA();
+    }
+
+    public Claims tokenParser(String token) {
+        return Jwts.parserBuilder().build().parseClaimsJws(token).getBody();
+    }
+
+    public String getCurrentAccountId() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
 }
