@@ -16,10 +16,6 @@ import javax.persistence.Id;
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
     private String keyA;
 
     @Column(nullable = false)

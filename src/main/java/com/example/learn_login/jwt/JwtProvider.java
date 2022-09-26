@@ -43,7 +43,8 @@ public class JwtProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        UserDetails principal = new org.springframework.security.core.userdetails.User(user.getAccountId(), "", authorities);
+        UserDetails principal =
+                new org.springframework.security.core.userdetails.User(user.getAccountId(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
@@ -70,7 +71,11 @@ public class JwtProvider {
     }
 
     public Claims tokenParser(String token) {
-        return Jwts.parserBuilder().build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    }
+
+    public Boolean isNonExpired(String token) {
+        return !tokenParser(token).getExpiration().after(new Date());
     }
 
     public String getCurrentAccountId() {

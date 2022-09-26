@@ -2,20 +2,20 @@ package com.example.learn_login.service;
 
 import com.example.learn_login.dto.request.RequestForSignUp;
 import com.example.learn_login.dto.response.TokenDto;
-import com.example.learn_login.dto.response.UpdateRefreshResponse;
 import com.example.learn_login.entity.RefreshRepo;
 import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
 import com.example.learn_login.entity.UserRepository;
+import com.example.learn_login.exception.ForbiddenException;
 import com.example.learn_login.exception.NotFoundException;
 import com.example.learn_login.jwt.JwtProvider;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -37,7 +37,7 @@ public class AuthService {
             .build());
     }
 
-    public TokenDto signIn(RequestForSignUp request) { // if already be in refresh token db, update refresh token
+    public TokenDto signIn(RequestForSignUp request) {
         UsernamePasswordAuthenticationToken authenticationToken = request.toAuthenticationToken();
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
@@ -48,19 +48,27 @@ public class AuthService {
                 .build();
     }
 
-    public UpdateRefreshResponse refresh(String refresh) {
-        Claims claim = jwtProvider.tokenParser(refresh);
-        RefreshToken refreshToken = refreshRepo.findByKeyA(claim.getSubject()).orElseThrow(NotFoundException::new);
+    @Transactional
+    public TokenDto issuance(String refresh) {
+        if (!jwtProvider.isNonExpired(refresh)) {
+            RefreshToken refreshToken = refreshRepo.findByKeyA(jwtProvider.tokenParser(refresh).getSubject())
+                    .orElseThrow(NotFoundException::new);
 
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(jwtProvider.getCurrentAccountId(), "");
+            UsernamePasswordAuthenticationToken authenticationToken = // principal : jwtProvider.getCurrentAccountId()
+                    new UsernamePasswordAuthenticationToken("account", "");
 
-        refreshToken.updateValue(jwtProvider.generateRefreshToken(authenticationToken));
-        refreshRepo.save(refreshToken);
+            TokenDto tokenDto = TokenDto.builder()
+                    .accessToken(jwtProvider.generateAccessToken(authenticationToken))
+                    .refreshToken(jwtProvider.generateRefreshToken(authenticationToken))
+                    .build();
 
-        return UpdateRefreshResponse.builder()
-                .before(refresh)
-                .after(refreshToken.getValueA())
-                .build();
+            refreshToken.updateValue(tokenDto.getRefreshToken());
+            refreshRepo.save(refreshToken);
+            return tokenDto;
+        }
+        else {
+            throw new ForbiddenException();
+        }
+
     }
 }

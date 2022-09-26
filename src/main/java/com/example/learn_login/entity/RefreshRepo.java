@@ -6,7 +6,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface RefreshRepo extends CrudRepository<RefreshToken, Long> {
+public interface RefreshRepo extends CrudRepository<RefreshToken, String> {
 
     Optional<RefreshToken> findByKeyA(String keyA);
+    Optional<RefreshToken> findByValueA(String valueA);
 }

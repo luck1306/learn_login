@@ -2,7 +2,6 @@ package com.example.learn_login.controller;
 
 import com.example.learn_login.dto.request.RequestForSignUp;
 import com.example.learn_login.dto.response.TokenDto;
-import com.example.learn_login.dto.response.UpdateRefreshResponse;
 import com.example.learn_login.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +34,7 @@ public class AuthController {
     }
 
     @PatchMapping("/refresh")
-    public UpdateRefreshResponse refresh(@RequestHeader("Refresh") String refresh) {
-        return authService.refresh(refresh);
+    public TokenDto refresh(@RequestHeader("Refresh") String refresh) {
+        return authService.issuance(refresh);
     }
 }
