@@ -3,6 +3,7 @@ package com.example.learn_login.jwt;
 import com.example.learn_login.entity.RefreshRepo;
 import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
+import com.example.learn_login.exception.ForbiddenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,10 +13,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -36,17 +37,9 @@ public class JwtProvider {
 
     private final RefreshRepo refreshRepo;
 
-    public UsernamePasswordAuthenticationToken generateAuthentication(User user) {
-
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(user.getRole().toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-        UserDetails principal =
-                new org.springframework.security.core.userdetails.User(user.getAccountId(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+    public UsernamePasswordAuthenticationToken generateAuthentication(String token) {
+        Claims claim = tokenParser(token);
+        return new UsernamePasswordAuthenticationToken(claim.getSubject(), "");
     }
 
     private String generateToken(String subject, String tokenType, Long exp) {
@@ -78,8 +71,12 @@ public class JwtProvider {
         return !tokenParser(token).getExpiration().after(new Date());
     }
 
-    public String getCurrentAccountId() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
+    public String parseRequest(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if(!token.startsWith("Bearer")) {
+            throw new ForbiddenException();
+        }
+        return token.substring(7);
     }
 
 }

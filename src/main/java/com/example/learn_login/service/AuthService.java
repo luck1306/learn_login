@@ -50,25 +50,26 @@ public class AuthService {
 
     @Transactional
     public TokenDto issuance(String refresh) {
-        if (!jwtProvider.isNonExpired(refresh)) {
-            RefreshToken refreshToken = refreshRepo.findByKeyA(jwtProvider.tokenParser(refresh).getSubject())
-                    .orElseThrow(NotFoundException::new);
-
-            UsernamePasswordAuthenticationToken authenticationToken = // principal : jwtProvider.getCurrentAccountId()
-                    new UsernamePasswordAuthenticationToken("account", "");
-
-            TokenDto tokenDto = TokenDto.builder()
-                    .accessToken(jwtProvider.generateAccessToken(authenticationToken))
-                    .refreshToken(jwtProvider.generateRefreshToken(authenticationToken))
-                    .build();
-
-            refreshToken.updateValue(tokenDto.getRefreshToken());
-            refreshRepo.save(refreshToken);
-            return tokenDto;
-        }
-        else {
+        if (jwtProvider.isNonExpired(refresh)) {
             throw new ForbiddenException();
         }
+        RefreshToken refreshToken = refreshRepo.findByKeyA(jwtProvider.tokenParser(refresh).getSubject())
+                .orElseThrow(NotFoundException::new);
+
+        UsernamePasswordAuthenticationToken authenticationToken = // principal : jwtProvider.getCurrentAccountId()
+                new UsernamePasswordAuthenticationToken("account", "");
+
+        TokenDto tokenDto = TokenDto.builder()
+                .accessToken(jwtProvider.generateAccessToken(authenticationToken))
+                .refreshToken(jwtProvider.generateRefreshToken(authenticationToken))
+                .build();
+
+        refreshToken.updateValue(tokenDto.getRefreshToken());
+        refreshRepo.save(refreshToken);
+        return tokenDto;
+    }
+
+    public void logout(String refresh) {
 
     }
 }

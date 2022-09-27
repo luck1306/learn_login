@@ -5,6 +5,7 @@ import com.example.learn_login.dto.response.TokenDto;
 import com.example.learn_login.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,4 +38,8 @@ public class AuthController {
     public TokenDto refresh(@RequestHeader("Refresh") String refresh) {
         return authService.issuance(refresh);
     }
+
+    @DeleteMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@RequestHeader("Refresh") String refresh) {}
 }
