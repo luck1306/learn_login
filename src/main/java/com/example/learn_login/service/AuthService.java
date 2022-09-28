@@ -9,10 +9,12 @@ import com.example.learn_login.entity.UserRepository;
 import com.example.learn_login.exception.ForbiddenException;
 import com.example.learn_login.exception.NotFoundException;
 import com.example.learn_login.jwt.JwtProvider;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +71,14 @@ public class AuthService {
         return tokenDto;
     }
 
+    @Transactional
     public void logout(String refresh) {
-
+        Claims claim = jwtProvider.tokenParser(refresh);
+        RefreshToken token = refreshRepo.findByKeyA(claim.getSubject()).orElseThrow(NotFoundException::new);
+        refreshRepo.delete(token);
+        // when don't receive refresh token
+//        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+//        RefreshToken refreshToken = refreshRepo.findByKeyA(userId).orElseThrow(NotFoundException::new);
+//        refreshRepo.delete(refreshToken);
     }
 }
