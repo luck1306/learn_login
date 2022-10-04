@@ -41,7 +41,7 @@ public class AuthController {
 
     @DeleteMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(@RequestHeader("Refresh") String refresh) {
+    public void logout(@RequestHeader("Refresh") @Valid String refresh) {
         authService.logout(refresh);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.learn_login.jwt;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -18,7 +19,8 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = jwtProvider.parseRequest(request);
         if (token != null) {
-            SecurityContextHolder.getContext().setAuthentication(jwtProvider.generateAuthentication(token));
+            Authentication authentication = jwtProvider.generateAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
     }

@@ -47,7 +47,7 @@ public class AuthService {
 
     @Transactional
     public TokenDto issuance(String refresh) {
-        if (jwtProvider.isNonExpired(refresh)) { // 일단 여기 문제는 아님
+        if (!jwtProvider.isNonExpired(refresh)) { // 일단 여기 문제는 아님
             throw new ForbiddenException();
         }
         String accountId = jwtProvider.tokenParser(refresh).getSubject();

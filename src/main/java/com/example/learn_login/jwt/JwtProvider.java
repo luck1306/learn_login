@@ -12,6 +12,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,10 +35,12 @@ public class JwtProvider {
 
     private final UserRepository userRepository;
 
+    private final CustomUserDetailsService customUserDetailsService;
+
     public UsernamePasswordAuthenticationToken generateAuthentication(String token) {
         Claims claim = tokenParser(token);
         User user = userRepository.findByAccountId(claim.getSubject()).orElseThrow(NotFoundException::new);
-        CustomUserDetails principle = new CustomUserDetails(user);
+        UserDetails principle = customUserDetailsService.loadUserByUsername(user.getAccountId());
         return new UsernamePasswordAuthenticationToken(principle, "");
     }
 
