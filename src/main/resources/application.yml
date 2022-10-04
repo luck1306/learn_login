@@ -17,4 +17,4 @@ jwt:
   secret: ${SECRET}
   expired:
     access: ${ACCESS}
-    refresh: @${REFRESH}
+    refresh: ${REFRESH}

@@ -14,9 +14,12 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         String token = jwtProvider.parseRequest(request);
-        SecurityContextHolder.getContext().setAuthentication(jwtProvider.generateAuthentication(token));
+        if (token != null) {
+            SecurityContextHolder.getContext().setAuthentication(jwtProvider.generateAuthentication(token));
+        }
         filterChain.doFilter(request, response);
     }
 }

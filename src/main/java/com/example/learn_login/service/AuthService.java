@@ -11,10 +11,6 @@ import com.example.learn_login.exception.NotFoundException;
 import com.example.learn_login.jwt.JwtProvider;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class AuthService {
-
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     private final JwtProvider jwtProvider;
 
@@ -40,35 +34,30 @@ public class AuthService {
     }
 
     public TokenDto signIn(RequestForSignUp request) {
-        UsernamePasswordAuthenticationToken authenticationToken = request.toAuthenticationToken();
+        User user = userRepository.findByAccountId(request.getAccountId()).orElseThrow(NotFoundException::new);
 
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new NotFoundException();
+        }
         return TokenDto.builder()
-                .accessToken(jwtProvider.generateAccessToken(authentication))
-                .refreshToken(jwtProvider.generateRefreshToken(authentication))
+                .accessToken(jwtProvider.generateAccessToken(user.getAccountId()))
+                .refreshToken(jwtProvider.generateRefreshToken(user.getAccountId()))
                 .build();
     }
 
     @Transactional
     public TokenDto issuance(String refresh) {
-        if (jwtProvider.isNonExpired(refresh)) {
+        if (jwtProvider.isNonExpired(refresh)) { // 일단 여기 문제는 아님
             throw new ForbiddenException();
         }
-        RefreshToken refreshToken = refreshRepo.findByKeyA(jwtProvider.tokenParser(refresh).getSubject())
+        String accountId = jwtProvider.tokenParser(refresh).getSubject();
+        refreshRepo.findByKeyA(accountId)
                 .orElseThrow(NotFoundException::new);
 
-        UsernamePasswordAuthenticationToken authenticationToken = // principal : jwtProvider.getCurrentAccountId()
-                new UsernamePasswordAuthenticationToken("account", "");
-
-        TokenDto tokenDto = TokenDto.builder()
-                .accessToken(jwtProvider.generateAccessToken(authenticationToken))
-                .refreshToken(jwtProvider.generateRefreshToken(authenticationToken))
+        return TokenDto.builder()
+                .accessToken(jwtProvider.generateAccessToken(accountId))
+                .refreshToken(jwtProvider.generateRefreshToken(accountId))
                 .build();
-
-        refreshToken.updateValue(tokenDto.getRefreshToken());
-        refreshRepo.save(refreshToken);
-        return tokenDto;
     }
 
     @Transactional
