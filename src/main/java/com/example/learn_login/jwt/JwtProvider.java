@@ -1,11 +1,11 @@
 package com.example.learn_login.jwt;
 
-import com.example.learn_login.entity.CustomUserDetails;
-import com.example.learn_login.entity.RefreshRepo;
+import com.example.learn_login.repository.RefreshRepo;
 import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
-import com.example.learn_login.entity.UserRepository;
+import com.example.learn_login.repository.UserRepository;
 import com.example.learn_login.exception.NotFoundException;
+import com.example.learn_login.service.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

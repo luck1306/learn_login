@@ -1,5 +1,6 @@
-package com.example.learn_login.entity;
+package com.example.learn_login.repository;
 
+import com.example.learn_login.entity.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

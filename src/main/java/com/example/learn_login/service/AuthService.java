@@ -2,10 +2,10 @@ package com.example.learn_login.service;
 
 import com.example.learn_login.dto.request.RequestForSignUp;
 import com.example.learn_login.dto.response.TokenDto;
-import com.example.learn_login.entity.RefreshRepo;
+import com.example.learn_login.repository.RefreshRepo;
 import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
-import com.example.learn_login.entity.UserRepository;
+import com.example.learn_login.repository.UserRepository;
 import com.example.learn_login.exception.ForbiddenException;
 import com.example.learn_login.exception.NotFoundException;
 import com.example.learn_login.jwt.JwtProvider;

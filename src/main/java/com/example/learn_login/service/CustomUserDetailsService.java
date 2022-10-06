@@ -1,8 +1,8 @@
-package com.example.learn_login.jwt;
+package com.example.learn_login.service;
 
 import com.example.learn_login.entity.CustomUserDetails;
 import com.example.learn_login.entity.User;
-import com.example.learn_login.entity.UserRepository;
+import com.example.learn_login.repository.UserRepository;
 import com.example.learn_login.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

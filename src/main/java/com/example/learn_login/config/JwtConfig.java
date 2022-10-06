@@ -1,5 +1,7 @@
-package com.example.learn_login.jwt;
+package com.example.learn_login.config;
 
+import com.example.learn_login.jwt.JwtFilter;
+import com.example.learn_login.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
