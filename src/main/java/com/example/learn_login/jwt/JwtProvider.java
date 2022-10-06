@@ -1,7 +1,6 @@
 package com.example.learn_login.jwt;
 
-import com.example.learn_login.repository.RefreshRepo;
-import com.example.learn_login.entity.RefreshToken;
+import com.example.learn_login.redis.RedisDao;
 import com.example.learn_login.entity.User;
 import com.example.learn_login.repository.UserRepository;
 import com.example.learn_login.exception.NotFoundException;
@@ -16,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.Date;
 
 @RequiredArgsConstructor
@@ -31,11 +31,11 @@ public class JwtProvider {
     @Value("${jwt.expired.refresh}")
     private Long refreshExp;
 
-    private final RefreshRepo refreshRepo;
-
     private final UserRepository userRepository;
 
     private final CustomUserDetailsService customUserDetailsService;
+
+    private final RedisDao redisDao;
 
     public UsernamePasswordAuthenticationToken generateAuthentication(String token) {
         Claims claim = tokenParser(token);
@@ -59,10 +59,9 @@ public class JwtProvider {
     }
 
     public String generateRefreshToken(String accountId) {
-        return refreshRepo.save(RefreshToken.builder()
-                .key(accountId)
-                .value(generateToken(accountId, "refresh_token", refreshExp))
-                .build()).getValueA();
+        String token = generateToken(accountId, "refresh_token", refreshExp);
+        setRefreshToken(accountId, token, 1000 * refreshExp);
+        return token;
     }
 
     public Claims tokenParser(String token) {
@@ -81,4 +80,7 @@ public class JwtProvider {
         return null;
     }
 
+    private void setRefreshToken(String accountId, String token, long exp) {
+        redisDao.setValues(accountId, token, Duration.ofMillis(exp));
+    }
 }

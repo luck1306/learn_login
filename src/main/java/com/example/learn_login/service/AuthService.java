@@ -2,9 +2,8 @@ package com.example.learn_login.service;
 
 import com.example.learn_login.dto.request.RequestForSignUp;
 import com.example.learn_login.dto.response.TokenDto;
-import com.example.learn_login.repository.RefreshRepo;
-import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
+import com.example.learn_login.redis.RedisDao;
 import com.example.learn_login.repository.UserRepository;
 import com.example.learn_login.exception.ForbiddenException;
 import com.example.learn_login.exception.NotFoundException;
@@ -25,7 +24,8 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final RefreshRepo refreshRepo;
+    private final RedisDao redisDao;
+
     public void signUp(RequestForSignUp request) {
         userRepository.save(User.builder()
             .accountId(request.getAccountId())
@@ -47,13 +47,13 @@ public class AuthService {
 
     @Transactional
     public TokenDto issuance(String refresh) {
-        if (!jwtProvider.isNonExpired(refresh)) { // 일단 여기 문제는 아님
+        if (!jwtProvider.isNonExpired(refresh)) {
             throw new ForbiddenException();
         }
         String accountId = jwtProvider.tokenParser(refresh).getSubject();
-        refreshRepo.findByKeyA(accountId)
-                .orElseThrow(NotFoundException::new);
-
+        if(!redisDao.isValueExist(accountId)) {
+            throw new NotFoundException();
+        }
         return TokenDto.builder()
                 .accessToken(jwtProvider.generateAccessToken(accountId))
                 .refreshToken(jwtProvider.generateRefreshToken(accountId))
@@ -63,8 +63,8 @@ public class AuthService {
     @Transactional
     public void logout(String refresh) {
         Claims claim = jwtProvider.tokenParser(refresh);
-        RefreshToken token = refreshRepo.findByKeyA(claim.getSubject()).orElseThrow(NotFoundException::new);
-        refreshRepo.delete(token);
+        String token = redisDao.getValues(claim.getSubject());
+        redisDao.deleteValues(token);
         // when don't receive refresh token
 //        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 //        RefreshToken refreshToken = refreshRepo.findByKeyA(userId).orElseThrow(NotFoundException::new);
