@@ -2,6 +2,7 @@ package com.example.learn_login.service;
 
 import com.example.learn_login.dto.request.RequestForSignUp;
 import com.example.learn_login.dto.response.TokenDto;
+import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
 import com.example.learn_login.repository.RefreshTokenRepository;
 import com.example.learn_login.repository.UserRepository;
@@ -53,18 +54,17 @@ public class AuthService {
         String accountId = jwtProvider.tokenParser(refresh).getSubject();
         if(!refreshRepository.existsById(accountId)) {
             throw new NotFoundException();
-//        }
+        }
         return TokenDto.builder()
                 .accessToken(jwtProvider.generateAccessToken(accountId))
                 .refreshToken(jwtProvider.generateRefreshToken(accountId))
                 .build();
     }
-
-    @Transactional
+        
     public void logout(String refresh) {
         Claims claim = jwtProvider.tokenParser(refresh);
-        String token = redisDao.getValues(claim.getSubject());
-        redisDao.deleteValues(token);
+        RefreshToken token = refreshRepository.findById(claim.getSubject()).orElseThrow(NotFoundException::new);
+        refreshRepository.delete(token);
         // when don't receive refresh token
 //        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 //        RefreshToken refreshToken = refreshRepo.findByKeyA(userId).orElseThrow(NotFoundException::new);
