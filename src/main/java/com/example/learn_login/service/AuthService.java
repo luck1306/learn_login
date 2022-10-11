@@ -3,7 +3,7 @@ package com.example.learn_login.service;
 import com.example.learn_login.dto.request.RequestForSignUp;
 import com.example.learn_login.dto.response.TokenDto;
 import com.example.learn_login.entity.User;
-import com.example.learn_login.redis.RedisDao;
+import com.example.learn_login.repository.RefreshTokenRepository;
 import com.example.learn_login.repository.UserRepository;
 import com.example.learn_login.exception.ForbiddenException;
 import com.example.learn_login.exception.NotFoundException;
@@ -24,7 +24,7 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final RedisDao redisDao;
+    private final RefreshTokenRepository refreshRepository;
 
     public void signUp(RequestForSignUp request) {
         userRepository.save(User.builder()
@@ -51,9 +51,9 @@ public class AuthService {
             throw new ForbiddenException();
         }
         String accountId = jwtProvider.tokenParser(refresh).getSubject();
-        if(!redisDao.isValueExist(accountId)) {
+        if(!refreshRepository.existsById(accountId)) {
             throw new NotFoundException();
-        }
+//        }
         return TokenDto.builder()
                 .accessToken(jwtProvider.generateAccessToken(accountId))
                 .refreshToken(jwtProvider.generateRefreshToken(accountId))
