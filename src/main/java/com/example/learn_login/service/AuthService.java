@@ -60,7 +60,7 @@ public class AuthService {
                 .refreshToken(jwtProvider.generateRefreshToken(accountId))
                 .build();
     }
-        
+
     public void logout(String refresh) {
         Claims claim = jwtProvider.tokenParser(refresh);
         RefreshToken token = refreshRepository.findById(claim.getSubject()).orElseThrow(NotFoundException::new);
