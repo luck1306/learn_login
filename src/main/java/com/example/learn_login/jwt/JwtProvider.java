@@ -4,7 +4,7 @@ import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
 import com.example.learn_login.repository.RefreshTokenRepository;
 import com.example.learn_login.repository.UserRepository;
-import com.example.learn_login.exception.NotFoundException;
+import com.example.learn_login.error.NotFoundException;
 import com.example.learn_login.service.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

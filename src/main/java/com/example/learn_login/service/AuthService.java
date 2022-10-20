@@ -6,8 +6,8 @@ import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
 import com.example.learn_login.repository.RefreshTokenRepository;
 import com.example.learn_login.repository.UserRepository;
-import com.example.learn_login.exception.ForbiddenException;
-import com.example.learn_login.exception.NotFoundException;
+import com.example.learn_login.error.ForbiddenException;
+import com.example.learn_login.error.NotFoundException;
 import com.example.learn_login.jwt.JwtProvider;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class AuthService {
     @Transactional
     public TokenDto issuance(String refresh) {
         if (!jwtProvider.isNonExpired(refresh)) {
-            throw new ForbiddenException();
+            throw ForbiddenException.EXCEPTION;
         }
         String accountId = jwtProvider.tokenParser(refresh).getSubject();
         if(!refreshRepository.existsById(accountId)) {
