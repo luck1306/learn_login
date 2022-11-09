@@ -11,13 +11,13 @@ spring:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
       ddl-auto: update
-    generate-ddl: true
+    generate-ddl: false
   redis:
-    host: localhost
-    port: 6379
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
 
 jwt:
-  secret: ${SECRET}
+  secret: ${SECRET:khfdsklajfhdsiufkbasdklfkashdfbgiaslkdhbfhksdaflfkg218oegfbdhkasf}
   expired:
-    access: ${ACCESS}
-    refresh: ${REFRESH}
+    access: ${ACCESS:1800}
+    refresh: ${REFRESH:43200}

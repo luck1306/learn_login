@@ -84,6 +84,7 @@ public class JwtProvider {
         refreshRepository.save(RefreshToken.builder()
                         .accountId(accountId)
                         .value(token)
+                        .exp(System.currentTimeMillis() + refreshExp) // or refreshExp
                         .build());
     }
 }
