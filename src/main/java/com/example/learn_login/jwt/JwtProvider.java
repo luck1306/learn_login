@@ -39,7 +39,7 @@ public class JwtProvider {
 
     public UsernamePasswordAuthenticationToken generateAuthentication(String token) {
         Claims claim = tokenParser(token);
-        User user = userRepository.findByAccountId(claim.getSubject()).orElseThrow(NotFoundException::new);
+        User user = userRepository.findByAccountId(claim.getSubject()).orElseThrow(() -> NotFoundException.EXCEPTION);
         UserDetails principle = customUserDetailsService.loadUserByUsername(user.getAccountId());
         return new UsernamePasswordAuthenticationToken(principle, "");
     }
@@ -60,7 +60,12 @@ public class JwtProvider {
 
     public String generateRefreshToken(String accountId) {
         String token = generateToken(accountId, "refresh_token", refreshExp);
-        setRefreshToken(accountId, token);
+        RefreshToken refreshToken = RefreshToken.builder()
+                .accountId(accountId)
+                .value(token)
+                .exp(System.currentTimeMillis() + refreshExp)
+                .build();
+        refreshRepository.save(refreshToken);
         return token;
     }
 
@@ -78,13 +83,5 @@ public class JwtProvider {
             return token.substring(7);
         }
         return null;
-    }
-
-    private void setRefreshToken(String accountId, String token) {
-        refreshRepository.save(RefreshToken.builder()
-                        .accountId(accountId)
-                        .value(token)
-                        .exp(System.currentTimeMillis() + refreshExp) // or refreshExp
-                        .build());
     }
 }

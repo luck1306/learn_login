@@ -25,7 +25,7 @@ public class RefreshToken {
     private Long exp;
 
     @Builder
-    public RefreshToken (String accountId, String value, long exp) {
+    public RefreshToken (String accountId, String value, Long exp) {
         this.accountId = accountId;
         this.token = value;
         this.exp = exp;

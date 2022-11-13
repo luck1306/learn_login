@@ -35,10 +35,11 @@ public class AuthService {
     }
 
     public TokenDto signIn(RequestForSignUp request) {
-        User user = userRepository.findByAccountId(request.getAccountId()).orElseThrow(NotFoundException::new);
+        User user = userRepository.findByAccountId(request.getAccountId())
+                .orElseThrow(() -> NotFoundException.EXCEPTION);
 
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new NotFoundException();
+            throw NotFoundException.EXCEPTION;
         }
         return TokenDto.builder()
                 .accessToken(jwtProvider.generateAccessToken(user.getAccountId()))
@@ -53,7 +54,7 @@ public class AuthService {
         }
         String accountId = jwtProvider.tokenParser(refresh).getSubject();
         if(!refreshRepository.existsById(accountId)) {
-            throw new NotFoundException();
+            throw NotFoundException.EXCEPTION;
         }
         return TokenDto.builder()
                 .accessToken(jwtProvider.generateAccessToken(accountId))
@@ -63,7 +64,8 @@ public class AuthService {
 
     public void logout(String refresh) {
         Claims claim = jwtProvider.tokenParser(refresh);
-        RefreshToken token = refreshRepository.findById(claim.getSubject()).orElseThrow(NotFoundException::new);
+        RefreshToken token = refreshRepository.findById(claim.getSubject())
+                .orElseThrow(() -> NotFoundException.EXCEPTION);
         refreshRepository.delete(token);
         // when don't receive refresh token
 //        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
