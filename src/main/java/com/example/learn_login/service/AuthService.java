@@ -72,4 +72,10 @@ public class AuthService {
 //        RefreshToken refreshToken = refreshRepo.findByKeyA(userId).orElseThrow(NotFoundException::new);
 //        refreshRepo.delete(refreshToken);
     }
+
+    public String getRefreshToken(String accountId) {
+        return "saving refresh token :" +  refreshRepository.findById(accountId)
+                .orElseThrow(()-> NotFoundException.EXCEPTION)
+                .getToken();
+    }
 }
