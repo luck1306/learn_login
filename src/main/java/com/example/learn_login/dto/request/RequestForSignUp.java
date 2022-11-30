@@ -1,5 +1,6 @@
 package com.example.learn_login.dto.request;
 
+import com.example.learn_login.entity.Role;
 import com.example.learn_login.entity.User;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
@@ -16,10 +17,14 @@ public class RequestForSignUp {
     @NotNull
     private String password;
 
+    @NotNull
+    private Role role;
+
     public User toUser() {
         return User.builder()
                 .accountId(this.accountId)
                 .password(this.password)
+                .role(this.role)
                 .build();
     }
 

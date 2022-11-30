@@ -1,9 +1,11 @@
 package com.example.learn_login.entity;
 
+import com.example.learn_login.dto.response.UsersInfoResponse;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,9 +35,21 @@ public class User {
     private Role role;
 
     @Builder
-    public User(String accountId, String password) {
+    public User(String accountId, String password, Role role) {
         this.accountId = accountId;
         this.password = password;
-        this.role = Role.USER;
+        this.role = role;
+    }
+
+    public UsersInfoResponse toDto() {
+        return UsersInfoResponse.builder()
+                .id(this.id)
+                .accountId(this.accountId)
+                .role(this.role)
+                .build();
+    }
+
+    public void encodePassword(PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(this.password);
     }
 }

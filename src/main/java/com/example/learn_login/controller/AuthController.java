@@ -2,6 +2,7 @@ package com.example.learn_login.controller;
 
 import com.example.learn_login.dto.request.RequestForSignUp;
 import com.example.learn_login.dto.response.TokenDto;
+import com.example.learn_login.dto.response.UsersInfoResponse;
 import com.example.learn_login.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/auth")
@@ -49,5 +51,10 @@ public class AuthController {
     @ResponseStatus(HttpStatus.NO_CONTENT) // header!! header!! header!!
     public void logout(@RequestHeader("Refresh") @Valid String refresh) {
         authService.logout(refresh);
+    }
+
+    @GetMapping("/admin")
+    public List<UsersInfoResponse> adminGet() {
+        return authService.adminGet();
     }
 }

@@ -2,6 +2,7 @@ package com.example.learn_login.service;
 
 import com.example.learn_login.dto.request.RequestForSignUp;
 import com.example.learn_login.dto.response.TokenDto;
+import com.example.learn_login.dto.response.UsersInfoResponse;
 import com.example.learn_login.entity.RefreshToken;
 import com.example.learn_login.entity.User;
 import com.example.learn_login.repository.RefreshTokenRepository;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -28,10 +32,9 @@ public class AuthService {
     private final RefreshTokenRepository refreshRepository;
 
     public void signUp(RequestForSignUp request) {
-        userRepository.save(User.builder()
-            .accountId(request.getAccountId())
-            .password(passwordEncoder.encode(request.getPassword()))
-            .build());
+        User user = request.toUser();
+        user.encodePassword(passwordEncoder);
+        userRepository.save(user);
     }
 
     public TokenDto signIn(RequestForSignUp request) {
@@ -77,5 +80,10 @@ public class AuthService {
         return "saving refresh token :" +  refreshRepository.findById(accountId)
                 .orElseThrow(()-> NotFoundException.EXCEPTION)
                 .getToken();
+    }
+
+    public List<UsersInfoResponse> adminGet() {
+        List<User> users = (List<User>) userRepository.findAll();
+        return users.stream().map(User::toDto).collect(Collectors.toList());
     }
 }
